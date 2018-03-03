@@ -1,0 +1,45 @@
+All the source code and makefile needed are in km folder and qt folder.
+
+source /ad/eng/courses/ec/ec535/bashrc_ec535
+
+In folder km:
+create binary mygpio.ko:
+	make
+
+In folder qt:
+create binary qt:
+	export PATH=/ad/eng/courses/ec/ec535/gumstix/oe/cross/bin:$PATH
+	make
+
+copy binary qt and mygpio.ko to gumstix via zmodem
+copy libraries into a sd card via zmodem:
+	sd card is in /media/card on gumstix
+	create a folder called lib
+	copy following: "fonts libQtCore.so.4 libQtGui.so.4 libQtNetwork.so.4 ld-uClibc.so.0 libc.so.0 libm.so.0 libstdc++.so.6"
+		from folder: /ad/eng/courses/ec/ec535/gumstix/oe/qt/lib
+		from folder: /ad/eng/courses/ec/ec535/arm-linux/lib
+		into /media/card/lib/
+create library links in gumstix:
+	cd /usr/lib
+	ln -s /media/card/lib/libQtCore.so.4 libQtCore.so.4
+	ln -s /media/card/lib/libQtGui.so.4 libQtGui.so.4
+	ln -s /media/card/lib/libQtNetwork.so.4 libQtNetwork.so.4
+	ln -s /media/card/lib/ld-uClibc.so.0 ld-uClibc.so.0
+	ln -s /media/card/lib/libc.so.0 libc.so.0
+	ln -s /media/card/lib/libm.so.0 libm.so.0
+	ln -s /media/card/lib/libstdc\+\+.so.6 libstdc\+\+.so.6
+export some variables in gumstix:
+	export QWS_MOUSE_PROTO='tslib:/dev/input/touchscreen0'
+	export TSLIB_CONFFILE=/etc/ts.conf
+	export TSLIB_PLUGINDIR=/usr/lib
+	export TSLIB_TSDEVICE=/dev/input/event0
+	export TSLIB_FBDEVICE=/dev/fb0
+	export TSLIB_CONSOLEDEVICE=/dev/tty
+	export QT_QWS_FONTDIR=/media/card/lib/fonts
+	export TSLIB_PLUGINDIR=/usr/lib/tsS
+mknod in dev:
+	mknod /dev/mygpio c 61 0
+Insert module:
+	insmod mygpio.ko
+Run binary qt:
+	./qt -qws
